@@ -1,0 +1,23 @@
+import {test,expect} from '@playwright/test';
+test('subpath PWA: install manifest, private draft, offline reload and mobile handoff',async({page,context})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/character-sheet-generator/');
+ await expect(page.getByRole('heading',{name:/A true reference/})).toBeVisible();
+ const manifest=await (await page.request.get('/character-sheet-generator/manifest.webmanifest')).json();
+ expect(manifest.start_url).toBe('./');expect(manifest.display).toBe('standalone');expect(manifest.icons.map((i:{sizes:string})=>i.sizes)).toEqual(['192x192','512x512']);
+ for(const icon of manifest.icons)expect((await page.request.get(`/character-sheet-generator/${icon.src}`)).status()).toBe(200);
+ await page.evaluate(()=>navigator.serviceWorker.ready);
+ await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBe(true);
+ const image=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;const ctx=canvas.getContext('2d')!;ctx.fillStyle='#abcd99';ctx.fillRect(0,0,32,32);return canvas.toDataURL('image/png').split(',')[1];});
+ await page.getByLabel('Add photographs',{exact:true}).setInputFiles({name:'subject-a.png',mimeType:'image/png',buffer:Buffer.from(image,'base64')});
+ await page.getByLabel('Subject name',{exact:true}).fill('Offline Subject');await page.getByLabel('I confirm').check();
+ await page.getByRole('button',{name:'Preview sheet →',exact:true}).click();await page.getByRole('button',{name:'Prepare for ChatGPT',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Continue in ChatGPT'})).toBeVisible();
+ await expect(page.getByRole('link',{name:'Open ChatGPT ↗'})).toHaveAttribute('href','https://chatgpt.com/');
+ const cacheUrls=await page.evaluate(async()=>{const names=await caches.keys();const cache=await caches.open(names.find(n=>n.startsWith('character-sheet-'))!);return (await cache.keys()).map(r=>r.url);});expect(cacheUrls.every(url=>!/subject|blob:/.test(url))).toBe(true);
+ await context.setOffline(true);await page.reload();await expect(page.getByRole('heading',{name:/A true reference/})).toBeVisible();
+ await page.getByRole('button',{name:'Recent',exact:true}).click();await page.getByRole('button',{name:'Open project',exact:true}).click();
+ await expect(page.getByLabel('Subject name',{exact:true})).toHaveValue('Offline Subject');await expect(page.locator('.photo img')).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(errors).toEqual([]);
+ await page.screenshot({path:'work/pwa-mobile.png',fullPage:true});
+});

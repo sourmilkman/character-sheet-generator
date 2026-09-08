@@ -2,6 +2,16 @@
 
 Private/internal ChatGPT-native character-sheet preparation app. This is a **separate project** from the M&S Cartoon Café Meme Creator (`sourmilkman/CAFECLOUDMEME`). It does not edit that app or access its Dropbox folder.
 
+## Install on your Android phone
+
+Open **https://sourmilkman.github.io/character-sheet-generator/** in Chrome. Tap **⋮ → Add to Home screen → Install**, or use the in-app Install button when offered. Open it once online to prepare offline use. No PC or MCP server is needed for this edition.
+
+Add photos, choose your preset, Preview, then **Prepare for ChatGPT**. This saves the draft locally and shows **Copy prompt for ChatGPT**, **Open ChatGPT**, and photo sharing where supported. Attach the selected original photos using ChatGPT's photo picker, paste the prompt and send. Individual photo downloads are available; no ZIP extraction is required for the normal mobile workflow.
+
+The editor and saved drafts work offline after the first successful load. ChatGPT still needs internet. Drafts stay in this browser/device and do not automatically transfer from the local PC URL. Clearing site data deletes local drafts. Keep exports as backups. Updates wait until you choose **Update app**; save your current draft first.
+
+GitHub Pages serves public application code only. Photographs are never uploaded to Pages, and the service worker caches only the application shell. On github.io, browser storage is shared by origin with the owner's other Pages apps: this is not a secure multi-user vault. Use only trusted apps on that origin, or host on a dedicated domain for stronger isolation.
+
 ## Run on your PC
 
 Open PowerShell in this folder:
@@ -12,7 +22,7 @@ npm run build
 npm start
 ```
 
-Open **http://127.0.0.1:4318**. Leave the terminal running. The ordinary browser editor supports uploads, drafts, prompt preparation and ZIP export. ChatGPT-specific generation handoff becomes available only inside a connected ChatGPT widget. This requested ChatGPT-native edition is not a GitHub Pages PWA: Pages cannot run the MCP server.
+Open **http://127.0.0.1:4318**. Leave the terminal running. The ordinary browser editor supports uploads, drafts, prompt preparation and ZIP export. ChatGPT-specific generation handoff becomes available only inside a connected ChatGPT widget. The build produces two editions: dist/pwa is the installable standalone Pages app; dist/index.html remains the separate ChatGPT MCP widget. Pages does not run the MCP server.
 
 Node.js 22+ is recommended. No OpenAI API key is required. The footer identifies version, source commit, build time and build model. `npm run dev` builds and starts without a watch process. Set `PORT` in your shell to override the default. `.env.example` documents settings; `.env` is not automatically loaded.
 
@@ -64,7 +74,7 @@ Docs checked 2026-09-08: Apps SDK URLs now redirect to Plugins documentation. Th
 
 A public HTTPS `/mcp` endpoint is another documented connection method. This app intentionally binds to loopback and ships no public deployment or authentication service. Use an authenticated deployment before serving it publicly. A private GitHub repository alone does not authenticate a running server.
 
-Live ChatGPT account/tunnel setup and actual image output are not covered by a successful local browser test. See docs/HANDOFF.md for the exact capability boundary. GitHub Pages cannot host this server.
+Live ChatGPT account/tunnel setup and actual image output are not covered by a successful local browser test. See docs/HANDOFF.md for the exact capability boundary. GitHub Pages hosts the standalone mobile editor, not this optional MCP server.
 
 ## Photos and reference ranking
 
@@ -122,6 +132,7 @@ npm test
 npm run build
 npx playwright install chromium
 npm run test:browser
+npm run test:pwa
 # With npm start running:
 npx tsx scripts/check-mcp.ts
 ```

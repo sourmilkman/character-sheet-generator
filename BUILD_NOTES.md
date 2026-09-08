@@ -19,3 +19,7 @@ Handoff: feature-detect uploadFile and setWidgetState. Upload only selected user
 Persistence: explicit local IndexedDB drafts and image blobs, with downloadable backup/export. Isolated host storage may be unavailable/evicted and does not sync devices. No claim of durable server persistence. ProjectStore and CharacterAssetStore isolate future authenticated storage. Host image handles remain in memory, not saved to drafts. No private download URLs are persisted.
 
 Identity controls: V1 rejects non-identity roles for generation, uses textual layouts only, validates one-subject confirmation, selects references deterministically, and never invents blank metadata. Reference coverage comes from user classification, not face recognition. Prompt restrictions improve instructions but cannot guarantee image-model compliance.
+
+## Mobile edition 1.1.0
+
+An independent static PWA is built into dist/pwa; the existing MCP widget remains separate. GitHub Actions publishes only dist/pwa. Relative manifest/scope URLs support the repository subpath. The application shell is cached under a revision-specific cache; photos remain in IndexedDB and never enter the service-worker cache. Updates wait for a user click, preventing loss of unsaved edits through automatic reloads. Mobile handoff explicitly saves the draft and guides manual photo attachment and prompt copying; native file sharing is capability-detected and never promises a specific target app.

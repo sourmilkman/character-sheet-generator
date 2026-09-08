@@ -20,3 +20,7 @@ Not verified:
 - Generated character-sheet retrieval; exported manifests explicitly mark output absent.
 
 Do not equate a simulated host test with an actual ChatGPT image-generation run. The application is locally working; in-ChatGPT acceptance remains pending connection setup.
+
+## Mobile PWA 1.1.0
+
+Passed strict typecheck, lint, 21 domain tests and all three existing widget browser scenarios. Added a PWA browser test at the GitHub repository subpath: manifest/start URL/icons, active service worker, local photo/draft saving, offline reload, draft photo restoration, guided ChatGPT handoff and no horizontal overflow. Service-worker cache inspected: application shell only, no photographs. Android installation UI and native share destinations still require a physical phone check.

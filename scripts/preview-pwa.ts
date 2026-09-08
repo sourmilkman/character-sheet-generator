@@ -1,0 +1,4 @@
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+const types:Record<string,string>={'index.html':'text/html; charset=utf-8','sw.js':'application/javascript','manifest.webmanifest':'application/manifest+json','icon-192.png':'image/png','icon-512.png':'image/png','build.json':'application/json'};
+createServer(async(req,res)=>{const url=new URL(req.url||'/', 'http://localhost');const prefix='/character-sheet-generator/';if(url.pathname==='/'){res.writeHead(302,{Location:prefix}).end();return;}const file=url.pathname.slice(prefix.length)||'index.html';if(!url.pathname.startsWith(prefix)||!types[file]){res.writeHead(404).end();return;}try{res.writeHead(200,{'Content-Type':types[file],'Cache-Control':'no-cache'});res.end(await readFile(`dist/pwa/${file}`));}catch{res.writeHead(404).end();}}).listen(4320,'127.0.0.1',()=>console.log('PWA preview: http://127.0.0.1:4320/character-sheet-generator/'));
