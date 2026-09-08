@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {Client} from '@modelcontextprotocol/sdk/client/index.js';
+import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import {newProject} from '../shared/model';
+const client=new Client({name:'character-sheet-check',version:'1.0.0'});
+await client.connect(new StreamableHTTPClientTransport(new URL('http://127.0.0.1:4318/mcp')));
+const tools=await client.listTools();assert.deepEqual(tools.tools.map(t=>t.name),['open_character_sheet','prepare_character_sheet']);
+const opened=await client.callTool({name:'open_character_sheet',arguments:{}});assert.equal(opened.isError,undefined);
+const resources=await client.listResources();assert.equal(resources.resources.length,1);const widget=await client.readResource({uri:resources.resources[0].uri});assert.equal(widget.contents[0].mimeType,'text/html;profile=mcp-app');assert(String(widget.contents[0].text).includes('CHARACTER SHEET'));
+const p=newProject();const bad=await client.callTool({name:'prepare_character_sheet',arguments:{project:p}});assert.equal(bad.isError,true);
+p.references=[{id:crypto.randomUUID(),filename:'mock.png',mime:'image/png',size:100,hash:'a'.repeat(64),role:'IDENTITY_REFERENCE',classification:'Front Face',notes:''}];p.primaryId=p.references[0].id;p.oneSubjectConfirmed=true;
+const prepared=await client.callTool({name:'prepare_character_sheet',arguments:{project:p}});assert(!prepared.isError);assert.equal((prepared.structuredContent?.referenceIds as string[]).length,1);
+console.log('MCP PASS: initialization, tool list, render tool, resource MIME/HTML, invalid and valid preparation.');await client.close();
