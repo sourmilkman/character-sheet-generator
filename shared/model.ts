@@ -14,4 +14,3 @@ export function newProject():CharacterSheetProject {const now=new Date().toISOSt
 export function parseProject(input:unknown):CharacterSheetProject{return projectSchema.parse(input) as CharacterSheetProject;}
 export const MAX_IMAGES=10;
 export function assertUploadBatch(existing:UploadedReference[],incoming:UploadedReference[]){if(existing.length+incoming.length>MAX_IMAGES)throw Error('Maximum 10 images. Remove a photograph before adding more.');const hashes=new Set(existing.map(r=>r.hash));for(const ref of incoming){referenceSchema.parse(ref);if(hashes.has(ref.hash))throw Error(`Duplicate image: ${ref.filename}`);hashes.add(ref.hash);}}
-
